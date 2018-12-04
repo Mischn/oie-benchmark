@@ -18,16 +18,16 @@ class GrapheneReader(OieReader):
                 line = line.strip('\n')
 
                 data = line.strip().split('\t')
-                if len(data) < 7:
+                if len(data) < 5:
                     continue
 
                 arg2 = ''
                 context_args = []
-                if len(data) == 7:
-                    text, identifier, extraction_type, conf, context_layer, arg1, pred = data[:7]
+                if len(data) == 5:
+                    text, identifier, context_layer, arg1, pred = data[:5]
                 else:
-                    text, identifier, extraction_type, conf, context_layer, arg1, pred, arg2 = data[:8]
-                    context_args = data[8:]
+                    text, identifier, context_layer, arg1, pred, arg2 = data[:6]
+                    context_args = data[6:]
                 context_layer = int(context_layer)
                 confidence = self.calc_confidence(text)
 
