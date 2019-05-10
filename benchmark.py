@@ -16,7 +16,8 @@ Options:
 import docopt
 import string
 import numpy as np
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import precision_recall_curve, average_precision_score, recall_score
+from sklearn.metrics.base import _average_binary_score
 import re
 import logging
 logging.basicConfig(level = logging.INFO)
@@ -96,8 +97,24 @@ class Benchmark:
         
         # recall on y_true, y  (r')_scores computes |covered by extractor| / |True in what's covered by extractor|
         # to get to true recall we do r' * (|True in what's covered by extractor| / |True in gold|) = |true in what's covered| / |true in gold|
-        p, r = Benchmark.prCurve(np.array(y_true), np.array(y_scores),
+        p, r, _ = Benchmark.prCurve(np.array(y_true), np.array(y_scores),
                        recallMultiplier = ((correctTotal - unmatchedCount)/float(correctTotal)))
+
+        # This is the area under the curve
+        auc = Benchmark.my_average_precision_score(np.array(y_true), np.array(y_scores),
+                       recallMultiplier = ((correctTotal - unmatchedCount)/float(correctTotal)))
+
+        # this is the average precision score
+        avgP = Benchmark.default_average_precision_score(np.array(y_true), np.array(y_scores))
+
+        rc = ((correctTotal - unmatchedCount)/float(correctTotal))
+
+        #print('p    {}'.format(p))
+        #print('r    {}'.format(r))
+        print('auc  {}'.format(auc))
+        print('avgP {}'.format(avgP))
+        print('rc   {}'.format(rc))
+
 
         # write PR to file
         with open(output_fn, 'w') as fout:
@@ -106,11 +123,31 @@ class Benchmark:
                 fout.write('{0}\t{1}\n'.format(cur_p, cur_r))
     
     @staticmethod
-    def prCurve(y_true, y_scores, recallMultiplier):
+    def prCurve(y_true, y_scores, recallMultiplier, sample_weight=None):
         # Recall multiplier - accounts for the percentage examples unreached by 
-        precision, recall, _ = precision_recall_curve(y_true, y_scores)
+        precision, recall, thresholds = precision_recall_curve(y_true, y_scores, sample_weight=sample_weight)
+
         recall = recall * recallMultiplier
-        return precision, recall
+        return precision, recall, thresholds
+
+    @staticmethod
+    def my_average_precision_score(y_true, y_score, recallMultiplier, average="macro", sample_weight=None):
+        def _binary_uninterpolated_average_precision(y_true, y_score, sample_weight=sample_weight):
+            precision, recall, thresholds = Benchmark.prCurve(y_true, y_score, recallMultiplier, sample_weight=sample_weight)
+            # Return the step function integral
+            # The following works because the last entry of precision is
+            # garantee to be 1, as returned by precision_recall_curve
+            return -np.sum(np.diff(recall) * np.array(precision)[:-1])
+
+        return _average_binary_score(_binary_uninterpolated_average_precision,
+                                     y_true, y_score, average,
+                                     sample_weight=sample_weight)
+
+
+    @staticmethod
+    def default_average_precision_score(y_true, y_scores, average="macro", sample_weight=None):
+        return average_precision_score(y_true, y_scores, average=average, sample_weight=sample_weight)
+
 
     # Helper functions:
     @staticmethod
