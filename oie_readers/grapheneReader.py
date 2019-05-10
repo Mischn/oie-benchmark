@@ -50,10 +50,22 @@ class GrapheneReader(OieReader):
                 for cl, t in simple_contexts:
                     curExtraction.addArg(t)
 
-                if False:
-                    for cl, a1, p, a2 in linked_contexts:
-                        curExtraction.addArg(' '.join([a1, p, a2]))
+                for cl, a1, p, a2 in linked_contexts:
+                    curExtraction.addArg(' '.join([a1, p, a2]))
 
-                d[text] = d.get(text, []) + [curExtraction]
+                
+                add = True
+
+                # is there already an extraction for the sentence that has the same relation?
+                if text in d:
+                    for i in range(len(d[text])):
+                        if d[text][i].pred == curExtraction.pred:
+                            add = False
+                            for a in curExtraction.args:
+                                d[text][i].addArg(a)
+                            break
+
+                if add:
+                    d[text] = d.get(text, []) + [curExtraction]
 
         self.oie = d
