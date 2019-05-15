@@ -1,5 +1,6 @@
 import re
 import numpy as np
+import os
 
 def read_dat(filepath):
     values = []
@@ -33,11 +34,22 @@ def auc_score(values):
     return res
 
 if __name__ == '__main__':
-    values = read_dat('AllWords-QASRL.dat')
-    auc = auc_score(values) # average precision == AUC
-    avgP = auc_score(stretch_values(values)) # average precision == AUC
-    rc = values[-1][1]
+    filepaths = []
+    for f in os.listdir('.'):
+        if f.endswith('.dat'):
+            filepaths.append(os.path.join('.', f))
 
-    print('auc  {}'.format(auc))
-    print('avgP {}'.format(avgP))
-    print('rc   {}'.format(rc))
+    for filepath in filepaths:
+        print()
+        print(filepath)
+        values = read_dat(filepath)
+        auc = auc_score(values) # average precision == AUC
+        avgP = auc_score(stretch_values(values)) # average precision == AUC
+        p = values[-1][0]
+        rc = values[-1][1]
+
+
+        print('auc  {}'.format(auc))
+        print('p    {}'.format(p))
+        print('avgP {}'.format(avgP))
+        print('rc   {}'.format(rc))

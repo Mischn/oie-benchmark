@@ -18,11 +18,11 @@ python benchmark.py --gold=./oie_corpus/all.oie --out=eval/PropS.dat --props=./s
 python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene.dat --graphene=./systems_output/graphene_new_output_nest.txt
 
 # Graphene as Framework
-python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_Stanford.dat --graphene=./systems_output/graphene_as_framework/stanfordOpenIEExtractor.txt
-python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_OLLIE.dat --graphene=./systems_output/graphene_as_framework/ollieExtractor.txt
-python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_ReVerb.dat --graphene=./systems_output/graphene_as_framework/reverbExtractor.txt
-python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_ClausIE.dat --graphene=./systems_output/graphene_as_framework/clausieExtractor.txt
-python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_OpenIE-4.dat --graphene=./systems_output/graphene_as_framework/openie4Extractor.txt
+#python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_Stanford.dat --graphene=./systems_output/graphene_as_framework/stanfordOpenIEExtractor.txt
+#python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_OLLIE.dat --graphene=./systems_output/graphene_as_framework/ollieExtractor.txt
+#python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_ReVerb.dat --graphene=./systems_output/graphene_as_framework/reverbExtractor.txt
+#python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_ClausIE.dat --graphene=./systems_output/graphene_as_framework/clausieExtractor.txt
+#python benchmark.py --gold=./oie_corpus/all.oie --out=eval/Graphene_OpenIE-4.dat --graphene=./systems_output/graphene_as_framework/openie4Extractor.txt
 
 
 python pr_plot.py --in=./eval --out=./eval/eval.png
