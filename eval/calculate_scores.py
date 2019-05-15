@@ -34,10 +34,12 @@ def auc_score(values):
     return res
 
 if __name__ == '__main__':
+    DIRECTORY = '.'
+
     filepaths = []
-    for f in os.listdir('.'):
+    for f in os.listdir(DIRECTORY):
         if f.endswith('.dat'):
-            filepaths.append(os.path.join('.', f))
+            filepaths.append(os.path.join(DIRECTORY, f))
 
     for filepath in filepaths:
         print()
