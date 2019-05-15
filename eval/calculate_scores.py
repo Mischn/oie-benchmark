@@ -33,25 +33,55 @@ def auc_score(values):
         last_r = r
     return res
 
-if __name__ == '__main__':
-    DIRECTORY = '.'
 
+
+def calc_improvement_perc(s1, s2):
+    return (s2 - s1) * 100./ s1
+
+
+def find_dat_files(directory):
     filepaths = []
     for f in os.listdir(DIRECTORY):
         if f.endswith('.dat'):
             filepaths.append(os.path.join(DIRECTORY, f))
+    return filepaths
 
-    for filepath in filepaths:
+def calculate_scores(filepath):
+    values = read_dat(filepath)
+    auc = auc_score(values) # average precision == AUC
+    avgP = auc_score(stretch_values(values)) # average precision == AUC
+    p = values[-1][0]
+    r = values[-1][1]
+    return {'auc':auc, 'p': p, 'avgP': avgP, 'r': r}
+
+if __name__ == '__main__':
+    DIRECTORY = './survey_plots1'
+
+    for filepath in find_dat_files(DIRECTORY):
         print()
         print(filepath)
-        values = read_dat(filepath)
-        auc = auc_score(values) # average precision == AUC
-        avgP = auc_score(stretch_values(values)) # average precision == AUC
-        p = values[-1][0]
-        rc = values[-1][1]
+        scores = calculate_scores(filepath)
+        for k in scores.keys():
+            print('\t{:<10}: {:.3f}'.format(k, scores[k]))
 
+    print('#'*100)
 
-        print('auc  {}'.format(auc))
-        print('p    {}'.format(p))
-        print('avgP {}'.format(avgP))
-        print('rc   {}'.format(rc))
+    # calculate improvements
+    
+    DIRECTORY = './survey_plots2'
+    compare_files = [
+        (DIRECTORY + '/ClausIE.dat', DIRECTORY + '/FW_ClausIE.dat'),
+        (DIRECTORY + '/OLLIE.dat', DIRECTORY + '/FW_OLLIE.dat'),
+        (DIRECTORY + '/OpenIE-4.dat', DIRECTORY + '/FW_OpenIE-4.dat'),
+        (DIRECTORY + '/ReVerb.dat', DIRECTORY + '/FW_ReVerb.dat'),
+        (DIRECTORY + '/Stanford.dat', DIRECTORY + '/FW_Stanford.dat')
+    ]
+
+    for f1, f2 in compare_files:
+        print()
+        print('{} <-> {}'.format(f1, f2))
+        scores1, scores2 = calculate_scores(f1), calculate_scores(f2)
+        for k in scores1.keys():
+            impr = calc_improvement_perc(scores1[k], scores2[k])
+            print('\t{:<10}: {}{:.0f}'.format(k, '+ ' if impr >= 0 else '', impr))
+
